@@ -32,6 +32,10 @@ public class RegisterViewModel
     public string ConfirmPassword { get; set; } = string.Empty;
 }
 
+public class FirstAdminViewModel : RegisterViewModel
+{
+}
+
 public class LoginViewModel
 {
     [Required(ErrorMessage = "请输入邮箱")]

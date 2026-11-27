@@ -1,0 +1,44 @@
+@model 周末作业1.Models.FirstAdminViewModel
+@{
+    ViewData["Title"] = "创建首个管理员";
+}
+
+<div class="auth-card">
+    <span class="eyebrow">INITIAL SETUP</span>
+    <h1>创建首个管理员</h1>
+    <p class="text-muted">这是系统首次配置入口。创建成功后，你可以在 Admin 用户管理页面创建其他 Admin 或 Student。</p>
+    <div class="alert alert-warning small">安全提示：该页面只在系统中不存在 Admin 账户时有效。</div>
+    <form asp-action="FirstAdmin" method="post">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label asp-for="FirstName" class="form-label"></label>
+                <input asp-for="FirstName" class="form-control" autocomplete="given-name" />
+                <span asp-validation-for="FirstName" class="text-danger"></span>
+            </div>
+            <div class="col-md-6 mb-3">
+                <label asp-for="LastName" class="form-label"></label>
+                <input asp-for="LastName" class="form-control" autocomplete="family-name" />
+                <span asp-validation-for="LastName" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="mb-3">
+            <label asp-for="Email" class="form-label"></label>
+            <input asp-for="Email" class="form-control" autocomplete="email" />
+            <span asp-validation-for="Email" class="text-danger"></span>
+        </div>
+        <div class="mb-3">
+            <label asp-for="Password" class="form-label"></label>
+            <input asp-for="Password" class="form-control" autocomplete="new-password" />
+            <span asp-validation-for="Password" class="text-danger"></span>
+            <small class="text-muted">至少 8 位并包含数字和大写字母。</small>
+        </div>
+        <div class="mb-4">
+            <label asp-for="ConfirmPassword" class="form-label"></label>
+            <input asp-for="ConfirmPassword" class="form-control" autocomplete="new-password" />
+            <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+        </div>
+        <button type="submit" class="btn btn-danger w-100">创建 Admin 账户</button>
+    </form>
+</div>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

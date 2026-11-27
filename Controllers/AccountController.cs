@@ -12,6 +12,63 @@ public class AccountController(
     [AllowAnonymous]
     public IActionResult Register() => View();
 
+    [AllowAnonymous]
+    public async Task<IActionResult> FirstAdmin()
+    {
+        var admins = await userManager.GetUsersInRoleAsync("Admin");
+        if (admins.Count > 0)
+        {
+            TempData["RoleError"] = "管理员账户已经存在，请使用现有 Admin 账户登录。";
+            return RedirectToAction(nameof(Login));
+        }
+
+        return View(new FirstAdminViewModel());
+    }
+
+    [HttpPost]
+    [AllowAnonymous]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> FirstAdmin(FirstAdminViewModel model)
+    {
+        if (!ModelState.IsValid)
+        {
+            return View(model);
+        }
+
+        var admins = await userManager.GetUsersInRoleAsync("Admin");
+        if (admins.Count > 0)
+        {
+            ModelState.AddModelError(string.Empty, "管理员账户已经存在，请使用现有 Admin 账户登录。");
+            return View(model);
+        }
+
+        var user = new ApplicationUser
+        {
+            UserName = model.Email,
+            Email = model.Email,
+            FirstName = model.FirstName.Trim(),
+            LastName = model.LastName.Trim()
+        };
+
+        var result = await userManager.CreateAsync(user, model.Password);
+        if (!result.Succeeded)
+        {
+            AddErrors(result);
+            return View(model);
+        }
+
+        var roleResult = await userManager.AddToRoleAsync(user, "Admin");
+        if (!roleResult.Succeeded)
+        {
+            await userManager.DeleteAsync(user);
+            AddErrors(roleResult);
+            return View(model);
+        }
+
+        await signInManager.SignInAsync(user, isPersistent: false);
+        return RedirectToAction("Users", "Admin");
+    }
+
     [HttpPost]
     [AllowAnonymous]
     [ValidateAntiForgeryToken]

@@ -38,5 +38,8 @@
         </div>
         <button type="submit" class="btn btn-primary w-100">注册</button>
     </form>
+    <div class="auth-divider"><span>首次使用系统？</span></div>
+    <a asp-action="FirstAdmin" class="btn btn-outline-danger w-100">创建首个管理员</a>
+    <small class="auth-note">该入口仅在系统中还没有 Admin 时有效。</small>
 </div>
 @section Scripts { <partial name="_ValidationScriptsPartial" /> }
