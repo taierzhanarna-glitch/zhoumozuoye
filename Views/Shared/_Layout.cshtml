@@ -1,0 +1,67 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - 周末作业1</title>
+    <script type="importmap"></script>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/周末作业1.styles.css" asp-append-version="true" />
+</head>
+<body>
+    <div class="app-shell">
+        <aside class="sidebar">
+            <a class="brand" asp-controller="Home" asp-action="Index">
+                <span class="brand-mark">◆</span>
+                <span>学途 <small>STUDY HUB</small></span>
+            </a>
+            <div class="sidebar-label">主菜单</div>
+            <nav class="sidebar-nav">
+                <a class="sidebar-link active" asp-controller="Home" asp-action="Index"><span>▦</span>仪表盘</a>
+                <a class="sidebar-link" asp-controller="Students" asp-action="Index"><span>♙</span>学生列表</a>
+                <a class="sidebar-link" href="#courses"><span>▤</span>我的课程</a>
+                <a class="sidebar-link" href="#calendar"><span>□</span>学习日历</a>
+            </nav>
+            <div class="sidebar-label">管理</div>
+            <nav class="sidebar-nav">
+                <a class="sidebar-link" href="#progress"><span>◔</span>学习进度</a>
+                @if (User.IsInRole("Admin"))
+                {
+                    <a class="sidebar-link" asp-controller="Students" asp-action="Index"><span>⚙</span>权限管理</a>
+                }
+            </nav>
+            <div class="sidebar-bottom">
+                <div class="help-card"><strong>需要帮助？</strong><small>查看学习指南和常见问题</small><a href="#help">打开帮助中心 →</a></div>
+            </div>
+        </aside>
+        <div class="main-area">
+            <header class="topbar">
+                <button class="mobile-menu" type="button" aria-label="打开菜单">☰</button>
+                <div class="search-box"><span>⌕</span><input type="search" placeholder="搜索课程、学生或内容..." /></div>
+                <div class="topbar-actions">
+                    <button class="icon-button" type="button" aria-label="通知">♧<i></i></button>
+                    @if (User.Identity?.IsAuthenticated == true)
+                    {
+                        <div class="user-chip"><span class="avatar">@(User.Identity.Name?[0].ToString().ToUpper() ?? "U")</span><span class="user-info"><strong>@User.Identity.Name</strong><small>@(User.IsInRole("Admin") ? "管理员" : "学生")</small></span></div>
+                        <form asp-controller="Account" asp-action="Logout" method="post"><button type="submit" class="logout-button">退出</button></form>
+                    }
+                    else
+                    {
+                        <a class="topbar-link" asp-controller="Account" asp-action="Login">登录</a>
+                        <a class="topbar-primary" asp-controller="Account" asp-action="Register">注册</a>
+                    }
+                </div>
+            </header>
+            <main role="main" class="content-area">
+            @RenderBody()
+            </main>
+            <footer class="dashboard-footer">© 2026 学途学习平台 · ASP.NET Core Identity</footer>
+        </div>
+    </div>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

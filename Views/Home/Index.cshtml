@@ -1,0 +1,45 @@
+﻿@{
+    ViewData["Title"] = "首页";
+}
+
+<div class="dashboard-heading">
+    <div>
+        <span class="eyebrow">学习中心 / 仪表盘</span>
+        <h1>欢迎回来@(User.Identity?.IsAuthenticated == true && User.Identity.Name is not null ? $"，{User.Identity.Name}" : "") <span class="wave">👋</span></h1>
+        <p>保持专注，今天也向你的学习目标前进一点点。</p>
+    </div>
+    @if (User.Identity?.IsAuthenticated != true)
+    {
+        <a asp-controller="Account" asp-action="Register" class="dashboard-action">开始学习 <span>→</span></a>
+    }
+    else
+    {
+        <a asp-controller="Students" asp-action="Index" class="dashboard-action">查看学生 <span>→</span></a>
+    }
+</div>
+
+<div class="stats-grid">
+    <div class="stat-card"><div class="stat-icon purple">▣</div><div><small>学习时长</small><strong>34<span>小时</span></strong><em class="up">↑ 12.5%</em></div></div>
+    <div class="stat-card"><div class="stat-icon cyan">◇</div><div><small>测验平均分</small><strong>82<span>%</span></strong><em class="up">↑ 8.2%</em></div></div>
+    <div class="stat-card"><div class="stat-icon orange">✺</div><div><small>完成课程</small><strong>14<span>门</span></strong><em class="up">↑ 4.3%</em></div></div>
+    <div class="stat-card time-card"><div><small>本周学习时间</small><strong>231<span>小时 14 分</span></strong><em class="up">↑ 18.4%</em></div><div class="progress-ring"><b>72<small>%</small></b></div></div>
+</div>
+
+<div class="dashboard-grid">
+    <section class="panel topic-panel">
+        <div class="panel-header"><div><h2>感兴趣的学习主题</h2><p>根据最近的学习记录统计</p></div><button class="more-button">⋮</button></div>
+        <div class="topic-chart">
+            <div class="chart-bars"><div><span>UI 设计</span><i style="width:82%"></i></div><div><span>UX 设计</span><i style="width:58%"></i></div><div><span>音乐</span><i style="width:40%"></i></div><div><span>动画</span><i style="width:32%"></i></div><div><span>React</span><i style="width:25%"></i></div><div><span>SEO</span><i style="width:20%"></i></div></div>
+            <div class="legend"><span><i class="dot purple-dot"></i>UI 设计 <b>35%</b></span><span><i class="dot cyan-dot"></i>UX 设计 <b>20%</b></span><span><i class="dot green-dot"></i>音乐 <b>14%</b></span><span><i class="dot orange-dot"></i>动画 <b>12%</b></span><span><i class="dot red-dot"></i>React <b>10%</b></span><span><i class="dot yellow-dot"></i>SEO <b>9%</b></span></div>
+        </div>
+    </section>
+    <section class="panel instructor-panel">
+        <div class="panel-header"><div><h2>热门学习者</h2><p>本周活跃度最高</p></div><button class="more-button">⋮</button></div>
+        <div class="person-list"><div class="person"><span class="person-avatar blue">M</span><span><strong>明轩</strong><small>UI/UX 设计</small></span><b>33</b></div><div class="person"><span class="person-avatar pink">L</span><span><strong>莉莉</strong><small>数字营销</small></span><b>25</b></div><div class="person"><span class="person-avatar green">W</span><span><strong>王浩然</strong><small>全栈开发</small></span><b>18</b></div><div class="person"><span class="person-avatar orange">B</span><span><strong>贝蒂</strong><small>产品设计</small></span><b>12</b></div></div>
+    </section>
+</div>
+
+<div class="dashboard-grid bottom-grid" id="courses">
+    <section class="panel courses-panel"><div class="panel-header"><div><h2>热门课程</h2><p>继续你的学习计划</p></div><a href="#courses" class="view-all">查看全部</a></div><div class="course-row"><span class="course-icon violet">▣</span><span><strong>视觉设计基础</strong><small>设计学院 · 12 个章节</small></span><b>72%</b></div><div class="course-row"><span class="course-icon blue-icon">⌘</span><span><strong>现代 Web 开发</strong><small>技术学院 · 18 个章节</small></span><b>58%</b></div><div class="course-row"><span class="course-icon yellow-icon">✦</span><span><strong>数字产品思维</strong><small>产品学院 · 10 个章节</small></span><b>41%</b></div></section>
+    <section class="panel progress-panel" id="progress"><div class="panel-header"><div><h2>课程进度</h2><p>你最近的学习情况</p></div><button class="more-button">⋮</button></div><div class="big-progress"><div class="progress-ring large"><b>72<small>%</small></b></div><div><h3>用户体验设计</h3><p>已完成 18 / 25 个任务</p><div class="mini-progress"><i></i></div><strong>还剩 7 个任务</strong></div></div></section>
+</div>
