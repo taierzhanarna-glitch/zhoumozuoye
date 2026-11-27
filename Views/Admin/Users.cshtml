@@ -1,0 +1,70 @@
+@model IReadOnlyList<周末作业1.Models.UserRoleViewModel>
+@{
+    ViewData["Title"] = "用户角色管理";
+}
+
+<div class="dashboard-heading">
+    <div>
+        <span class="eyebrow">Admin / 用户管理</span>
+        <h1>用户角色管理</h1>
+        <p>为已注册用户分配 Student 或 Admin 角色。</p>
+    </div>
+</div>
+
+@if (TempData["RoleMessage"] is string message)
+{
+    <div class="alert alert-success">@message</div>
+}
+@if (TempData["RoleError"] is string error)
+{
+    <div class="alert alert-danger">@error</div>
+}
+
+<section class="panel role-management-panel">
+    <div class="panel-header">
+        <div>
+            <h2>注册用户 <span class="count-badge">@Model.Count</span></h2>
+            <p>角色变更将在用户重新登录后生效。</p>
+        </div>
+        <span class="badge text-bg-danger">仅 Admin 可访问</span>
+    </div>
+    <div class="table-responsive">
+        <table class="table align-middle role-table">
+            <thead>
+                <tr>
+                    <th>用户</th>
+                    <th>Email</th>
+                    <th>当前角色</th>
+                    <th class="text-end">更新角色</th>
+                </tr>
+            </thead>
+            <tbody>
+            @foreach (var user in Model)
+            {
+                <tr>
+                    <td>
+                        <div class="admin-user-cell">
+                            <span class="avatar">@(user.Email.FirstOrDefault().ToString().ToUpper())</span>
+                            <span><strong>@(string.IsNullOrWhiteSpace(user.FullName) ? "未填写姓名" : user.FullName)</strong><small>ID: @user.UserId</small></span>
+                        </div>
+                    </td>
+                    <td>@user.Email</td>
+                    <td>
+                        <span class="role-badge @(user.CurrentRole == "Admin" ? "admin-role" : "student-role")">@user.CurrentRole</span>
+                    </td>
+                    <td class="text-end">
+                        <form asp-action="UpdateRole" method="post" class="role-form">
+                            <input type="hidden" name="UserId" value="@user.UserId" />
+                            <select name="Role" class="form-select form-select-sm" aria-label="为 @user.Email 选择角色">
+                                <option value="Student" selected="@(user.CurrentRole == "Student")">Student</option>
+                                <option value="Admin" selected="@(user.CurrentRole == "Admin")">Admin</option>
+                            </select>
+                            <button type="submit" class="btn btn-sm btn-primary">保存</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+</section>

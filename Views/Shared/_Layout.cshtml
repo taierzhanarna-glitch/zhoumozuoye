@@ -28,7 +28,7 @@
                 <a class="sidebar-link" href="#progress"><span>◔</span>学习进度</a>
                 @if (User.IsInRole("Admin"))
                 {
-                    <a class="sidebar-link" asp-controller="Students" asp-action="Index"><span>⚙</span>权限管理</a>
+                    <a class="sidebar-link" asp-controller="Admin" asp-action="Users"><span>⚙</span>用户角色管理</a>
                 }
             </nav>
             <div class="sidebar-bottom">
