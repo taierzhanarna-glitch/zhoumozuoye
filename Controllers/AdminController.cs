@@ -36,6 +36,51 @@ public class AdminController(
         return View(result);
     }
 
+    [HttpGet]
+    public IActionResult CreateUser() => View(new CreateUserViewModel());
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> CreateUser(CreateUserViewModel model)
+    {
+        if (!ModelState.IsValid)
+        {
+            return View(model);
+        }
+
+        if (!await roleManager.RoleExistsAsync(model.Role))
+        {
+            ModelState.AddModelError(nameof(model.Role), "所选角色不存在。");
+            return View(model);
+        }
+
+        var user = new ApplicationUser
+        {
+            UserName = model.Email,
+            Email = model.Email,
+            FirstName = model.FirstName.Trim(),
+            LastName = model.LastName.Trim()
+        };
+
+        var createResult = await userManager.CreateAsync(user, model.Password);
+        if (!createResult.Succeeded)
+        {
+            AddCreateErrors(createResult);
+            return View(model);
+        }
+
+        var roleResult = await userManager.AddToRoleAsync(user, model.Role);
+        if (!roleResult.Succeeded)
+        {
+            await userManager.DeleteAsync(user);
+            AddCreateErrors(roleResult);
+            return View(model);
+        }
+
+        TempData["RoleMessage"] = $"用户 {user.Email} 已创建，角色为 {model.Role}。";
+        return RedirectToAction(nameof(Users));
+    }
+
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> UpdateRole(UpdateUserRoleViewModel model)
@@ -104,5 +149,19 @@ public class AdminController(
     private void AddErrors(IdentityResult result)
     {
         TempData["RoleError"] = string.Join(" ", result.Errors.Select(error => error.Description));
+    }
+
+    private void AddCreateErrors(IdentityResult result)
+    {
+        foreach (var error in result.Errors)
+        {
+            var key = error.Code is "DuplicateUserName" or "DuplicateEmail"
+                ? nameof(CreateUserViewModel.Email)
+                : string.Empty;
+            var message = error.Code is "DuplicateUserName" or "DuplicateEmail"
+                ? "该邮箱已经注册。"
+                : error.Description;
+            ModelState.AddModelError(key, message);
+        }
     }
 }
