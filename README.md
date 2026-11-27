@@ -1,43 +1,114 @@
-# ASP.NET Core Identity 学生管理平台
+# ASP.NET Core Identity студенттерді басқару платформасы
 
-本项目使用 ASP.NET Core MVC（目标框架 .NET 10）实现用户注册、登录、退出和基于角色的访问控制。
+Бұл оқу жобасы ASP.NET Core Identity арқылы тіркелу, жүйеге кіру, шығу және рөлге негізделген рұқсаттарды көрсетеді. Жоба .NET 10 және ASP.NET Core MVC негізінде жасалған, деректер қоры ретінде SQLite қолданылады.
 
-## 功能
+## Оқу талаптарының орындалуы
 
-- `ApplicationUser` 扩展 `IdentityUser`，保存 FirstName 和 LastName。
-- SQLite 数据库保存 Identity 用户、角色和声明数据。
-- 新注册用户自动获得 `Student` 角色。
-- `Student` 和 `Admin` 都可以查看学生列表。
-- 只有 `Admin` 可以通过受 CSRF 保护的 POST 请求删除学生。
-- 密码由 ASP.NET Core Identity 哈希保存，不在代码中保存任何密码。
+- `ApplicationUser` класы `IdentityUser` класынан мұраланады және `FirstName`, `LastName` өрістерін сақтайды.
+- `AppDbContext` `IdentityDbContext<ApplicationUser>` класынан мұраланады.
+- Қосымша іске қосылғанда `Admin` және `Student` рөлдері автоматты түрде жасалады.
+- Жаңа пайдаланушы тіркелгеннен кейін оған қауіпсіз түрде `Student` рөлі беріледі.
+- Тіркелу формасында Email, FirstName, LastName, Password және ConfirmPassword бар.
+- Қайталанатын Email үшін түсінікті қате көрсетіледі.
+- Кірмеген пайдаланушы `/Students` бетіне кіре алмайды.
+- `Student` студенттер тізімін көре алады, бірақ жоя алмайды.
+- `Admin` тізімді көре алады және студентті жоя алады.
+- Logout тек POST арқылы орындалады және CSRF-тен қорғалған.
+- Құпиясөздер ашық түрде сақталмайды: Identity оларды хэш түрінде сақтайды.
 
-## 运行步骤
+## Қолданылған технологиялар
 
-1. 安装 .NET 10 SDK。
-2. 在项目目录执行 `dotnet restore`。
-3. 执行 `dotnet run`。应用启动时会自动执行迁移并创建 `Admin`、`Student` 角色。
-4. 访问应用后注册一个账户，注册成功后即可查看学生列表。
+- .NET 10
+- ASP.NET Core MVC
+- ASP.NET Core Identity
+- Entity Framework Core 10
+- SQLite
+- Bootstrap және responsive CSS
 
-数据库连接在 `appsettings.json` 中指向本地 `app.db`。该文件已加入 `.gitignore`，不会提交到仓库。生产环境请通过环境变量或 Secret Manager 配置连接字符串和其他敏感值。
+## Іске қосу
 
-## 管理员测试
+1. .NET 10 SDK орнатыңыз.
+2. Репозиторийді жүктеп, жоба бумасына өтіңіз:
 
-项目不会在源代码中硬编码管理员密码。要测试 Admin 权限，可以在开发数据库中使用 EF Core 或受保护的管理工具将用户加入 `Admin` 角色，例如在应用服务范围内调用：
-
-```csharp
-await userManager.AddToRoleAsync(user, "Admin");
+```powershell
+git clone https://github.com/taierzhanarna-glitch/zhoumozuoye.git
+cd zhoumozuoye
 ```
 
-测试结果应包括：未登录用户访问 `/Students` 被重定向到登录页；Student 能查看但不能删除；Admin 能查看并删除。
+3. Пакеттерді қалпына келтіріңіз:
 
-## 迁移
+```powershell
+dotnet restore
+```
 
-初始迁移位于 `Data/Migrations`。手动更新数据库可执行：
+4. Деректер қорының миграциясын орындаңыз:
 
-```bash
+```powershell
 dotnet ef database update
 ```
 
-## 提交材料建议
+5. Қосымшаны іске қосыңыз:
 
-运行应用后分别截取注册、登录、Student 无权删除和 Admin 允许删除页面，作为作业截图。遇到问题时可查看 ASP.NET Core 日志和页面 `ModelState` 验证错误。
+```powershell
+dotnet run
+```
+
+Қосымша іске қосылған кезде `Admin` және `Student` рөлдерінің бар-жоғын тексереді және қажет болса жасайды. SQLite деректер қоры `app.db` файлында сақталады. Бұл файл `.gitignore` арқылы репозиторийге жіберілмейді.
+
+## Admin рөлін беру және тексеру
+
+Қауіпсіздік үшін ашық тіркелу формасында рөл таңдау өрісі жоқ. Пайдаланушы өзін өзі Admin ете алмайды. Admin рөлін тек әзірлеу ортасында немесе қорғалған әкімшілік құрал арқылы беріңіз.
+
+### Әдіс 1: уақытша әзірлеу коды
+
+Тіркелген пайдаланушының Email адресін өзіңізге белгілі мәнге ауыстырып, `Program.cs` ішіндегі қолданба іске қосылғаннан кейінгі service scope-қа уақытша мына кодты қосуға болады:
+
+```csharp
+var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
+var user = await userManager.FindByEmailAsync("admin@example.com");
+if (user is not null && !await userManager.IsInRoleAsync(user, "Admin"))
+{
+    await userManager.AddToRoleAsync(user, "Admin");
+}
+```
+
+Қосымшаны бір рет іске қосқаннан кейін рөлдің берілгенін тексеріңіз де, бұл уақытша кодты міндетті түрде өшіріңіз. Жаңа құпиясөзді немесе API кілтін кодқа жазбаңыз.
+
+### Әдіс 2: деректер қорын көру арқылы тексеру
+
+SQLite Database Browser арқылы `app.db` файлын ашыңыз:
+
+1. `AspNetUsers` кестесінен пайдаланушының `Id` мәнін табыңыз.
+2. `AspNetRoles` кестесінен `Admin` рөлінің `Id` мәнін табыңыз.
+3. `AspNetUserRoles` кестесінде осы екі мәннен тұратын жаңа жол қосыңыз.
+4. Қосымшадан шығып, қайта кіріңіз.
+5. `/Students` бетіне өтіңіз. Admin үшін «Жою» батырмасы көрінуі керек.
+6. Student аккаунтымен кіргенде «Жою» батырмасы болмауы керек.
+7. Student аккаунты арқылы Delete POST сұрауын әдейі жіберіп көрсеңіз, сервер `403 Forbidden` немесе Access Denied бетіне бағыттауы керек.
+
+Бұл тексеру интерфейстегі батырманы жасыруға ғана емес, сервердегі `[Authorize(Roles = "Admin")]` қорғанысына сүйенеді.
+
+## Миграциялар
+
+Бастапқы Identity миграциясы `Data/Migrations` бумасында орналасқан. Жаңа миграция жасау үшін:
+
+```powershell
+dotnet ef migrations add MigrationName
+dotnet ef database update
+```
+
+## Тестілеу
+
+Тест сценарийлері мен нәтижелері [docs/TEST-REPORT.md](docs/TEST-REPORT.md) файлында берілген. Тіркелу, кіру, Student шектеуі және Admin рұқсаты бойынша материалдар [screenshots](screenshots/README.md) бумасында орналасқан.
+
+## Қауіпсіздік
+
+- Password, API key және production connection string репозиторийге сақталмайды.
+- SQLite файлы, `bin`, `obj` және Visual Studio уақытша файлдары `.gitignore` ішінде.
+- Барлық POST әрекеттері `ValidateAntiForgeryToken` арқылы қорғалған.
+- Рөлдер формадағы hidden field арқылы қабылданбайды.
+- Нақты production жүйесінде Admin тағайындау жеке қорғалған әкімшілік панель арқылы орындалуы керек.
+
+## Қорытынды
+
+Жоба барысында негізгі қиындық Identity кестелерін бастапқы деректер қорымен байланыстыру және Student/Admin құқықтарын бөлу болды. Бұл мәселе `IdentityDbContext`, `UserManager`, `RoleManager`, `SignInManager` және `[Authorize(Roles = "Admin")]` механизмдерін бірге қолдану арқылы шешілді.
